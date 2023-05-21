@@ -1,24 +1,67 @@
 
 
-DBoW3
-=====
-
-## 
-## For an improved version of this project, please see FBOW https://github.com/rmsalinas/fbow. 
+# pydbow
+## python wrapped version of DBoW3 library
 
 
+This is pybind repository of well-known Loop Closure Detection (LCD) library, DBoW3.
+For details about the library itself, please refer to the original repository. [link here](https://github.com/rmsalinas/DBow3.git)
 
 
-DBoW3 is an improved version of the DBow2 library, an open source C++ library for indexing and converting images into a bag-of-word representation. It implements a hierarchical tree for approximating nearest neighbours in the image feature space and creating a visual vocabulary. DBoW3 also implements an image database with inverted and direct files to index images and enabling quick queries and feature comparisons. The main differences with the previous DBow2 library are:
+## Installation notes
+Just like the original DBoW3 library, **OpenCV** is required.
+Users can now build this extension module with **pip install**. 
+There are no python module dependencies, but we recommend python 3.7+.
+Using python virtual environment (e.g. anaconda3) is recommended.
+```
+# assume current path is project root (/path/to/pydbow)
+pip install -e .
+```
+## How to use
 
-  * DBoW3 only requires OpenCV.  DBoW2 dependency of DLIB is been removed.
-  * DBoW3 is able to use both binary and floating point descriptors out of the box. No need to reimplement any class for any descriptor.
-  * DBoW3 compiles both in linux and windows.  
-  * Some pieces of code have been rewritten to optimize speed. The interface of DBoW3 has been simplified.
-  * Possibility of using binary files. Binary files are 4-5 times faster to load/save than yml. Also, they can be compressed.
-  * Compatible with DBoW2 yml files
+### Vocabulary Creation
 
-## 
+```python
+
+import pydbow
+
+# create from an empty instance
+voc = pydbow.Vocabulary(4,3) # k, L
+
+# training_features should be a list of binary descriptors
+# each descriptor is 2d ndarray, where each row is a descriptors
+# so the shape should be N,D
+# N = number_of_descriptors_from_an_image
+# D = dimension_of_descriptors with dtype as uint8
+# note that D should be packbits (256 bits -> 32 dimensions)
+training_features = [] # append binary descriptors here
+voc.create(training_features)
+
+# save vocabulary
+voc.save("save/path/here")
+
+# OR load vocabulary from a file
+voc = pydbow.Vocabulary("path/to/file")
+```
+
+### Database add & query
+
+```python
+
+import pydbow
+
+db = pydbow.Database(voc)
+
+# add 2d ndarray binary descriptors to database
+# its shape should be the same as the one from vocabulary creation
+db.add(descriptors)
+
+# parameters: descriptors, max_results, max_id
+# returns: a list of tuple (index, score)
+results = db.query(q_descriptors, 5, -1)
+```
+
+
 ## Citing
 
 If you use this software in an academic work, please cite:
@@ -29,26 +72,3 @@ If you use this software in an academic work, please cite:
   urldate = {2017-02-17} 
  } 
 ```
-
-
-## Installation notes
- 
-DBoW3 requires OpenCV only.
-
-For compiling the utils/demo_general.cpp you must compile against OpenCV 3. If you have installed the contrib_modules, use cmake option -DUSE_CONTRIB=ON to enable SURF.
-
-## How to use
-
-Check utils/demo_general.cpp
-
-### Classes 
-
-DBoW3 has two main classes: `Vocabulary` and `Database`. These implement the visual vocabulary to convert images into bag-of-words vectors and the database to index images.
-See utils/demo_general.cpp for an example
-
-### Load/Store Vocabulary
-
-The file orbvoc.dbow3 is the ORB vocabulary in ORBSLAM2 but in binary format of DBoW3:  https://github.com/raulmur/ORB_SLAM2/tree/master/Vocabulary
- 
-
-

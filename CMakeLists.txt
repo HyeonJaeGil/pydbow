@@ -1,9 +1,9 @@
 # ----------------------------------------------------------------------------
 #   Basic Configuration
 # ----------------------------------------------------------------------------
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0.2)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 PROJECT(DBoW3)
 set(PROJECT_VERSION "0.0.1")
@@ -43,7 +43,7 @@ endif()
 
 
 #
-OPTION(BUILD_UTILS	"Set to OFF to not build utils" ON)
+OPTION(BUILD_UTILS	"Set to OFF to not build utils" OFF)
 OPTION(USE_CONTRIB 	"Set to ON if contrib are installed" OFF)
 OPTION(BUILD_SHARED_LIBS 	"Set to OFF to build static libraries" ON)
 
@@ -266,3 +266,8 @@ MESSAGE( STATUS )
 MESSAGE( STATUS )
 MESSAGE( STATUS "Change a value with: cmake -D<Variable>=<Value>" )
 MESSAGE( STATUS )
+
+include_directories(${PROJECT_SOURCE_DIR}/src)
+add_subdirectory(pybind11)
+pybind11_add_module(pydbow "pydbow.cpp")
+target_link_libraries(pydbow PRIVATE ${OpenCV_LIBS} ${PROJECT_NAME})
